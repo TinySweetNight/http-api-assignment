@@ -1,28 +1,51 @@
 
 
 const respondJSON = (request, response, status, object) => {
-  const content = JSON.stringify(object);
+  let content;
 
-  console.log(request.acceptedTypes[0]);
+  if(request.acceptedTypes !== undefined)
+  {
+    if(request.acceptedTypes[0] === 'text/xml') {
+    content = '<response>';
+    content = `${content} <message>${object.message}</message>`;
+    if(object.id !== undefined)
+    {
+       content = `${content} <id>${object.id}</id>`;
+    }
+    content = `${content} </response>`;
+    }
+    else {
+        content = JSON.stringify(object);
+    }
+  }
+  else
+  {
+      content = JSON.stringify(object);
+  }
 
-  //If it's not s set to xml change it. 
 
-  //this is an If statement
-  response.writeHead(status, { 
+  if(request.acceptedTypes !== undefined){
+      response.writeHead(status, { 
+    'Content-Type': request.acceptedTypes[0],
+    'Content-Length': Buffer.byteLength(content, 'utf8'),
+  }); } else{
+      response.writeHead(status, { 
     'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(content, 'utf8'),
   });
+  };
 
-  // Some where?? If 
   response.write(content);
   response.end();
 };
 
 
 const success = (request, response) => {
+
   const responseJSON = {
-    message: 'This is a successful response',
-  };
+      message: 'This is a successful response',   
+  }
+
   return respondJSON(request, response, 200, responseJSON);
 };
 
@@ -48,7 +71,7 @@ const unauthorized = (request, response) => {
     message: 'This request has the required parameters',
   };
 
-  if(!request.query.loggedIn || request.query.loggedIn !== 'true'){
+  if(!request.query.loggedIn || request.query.loggedIn !== 'yes'){
     responseJSON.message = "Missing loggedIn query parameters set to yes";
     responseJSON.id = 'unauthorized';
     return respondJSON(request, response, 401, responseJSON);

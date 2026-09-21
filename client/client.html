@@ -36,21 +36,32 @@
           break;
       }
 
-      const resObj = await response.json();
-      content.innerHTML += `<p>Message: ${resObj.message}</p>`;
+      response.text().then((resText) => {
+        const contentType = response.headers.get('Content-Type');
 
+        console.log(resText);
+
+        if(contentType === 'application/json') {
+          //Parse the json back into a javascript object, and display the data.
+          const parsedResponse = JSON.parse(resText);
+          content.innerHTML += `<p>Message: ${parsedResponse.message}</p>`;
+        } else if (contentType === 'text/xml') { //If the server sent back xml
+          //Parse the xml into a document and select the data out.
+          const parsedResponse = new window.DOMParser().parseFromString(resText, 'text/xml');
+          content.innerHTML += `<p>Message: ` + parsedResponse.querySelector('message').textContent + '</p>';
+        }
+
+      });
     };
     
     const sendFetch = async (url, acceptedType) => {
-      console.log(acceptedType);
 
        const options = {
         method: 'GET',
-        headers: {Accept: acceptedType}
+        headers: {'Accept': acceptedType},
       }
-
-      fetch(url,options).then((response)=>console.log(response));
-      fetch(url,options).then((response)=>handleResponse(response));
+     // fetch(url,options).then((response)=>console.log(response));
+      fetch(url,options).then((response)=> {handleResponse(response)});
     };
 
     var pageValue;

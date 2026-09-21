@@ -11,7 +11,7 @@ const urlStruct = {
   '/unauthorized': jsonHandler.unauthorized,
   '/forbidden': jsonHandler.forbidden,
   '/internal': jsonHandler.internal,
-  '/notImplimented': jsonHandler.notImplimented,
+  '/notImplemented': jsonHandler.notImplimented,
   '/style.css' : htmlHandler.getCSS,
   notFound: jsonHandler.notFound,
 };
@@ -21,9 +21,11 @@ const onRequest = (request, response) => {
   const protocol = request.connection.encrypted ? 'https' : 'http';
   const parsedUrl = new URL(request.url, `${protocol}://${request.headers.host}`);
 
-  request.query = Object.fromEntries(parsedUrl.searchParams);
+  if(request.headers.accept) {
+    request.acceptedTypes = request.headers.accept.split(',');
+  }
 
-  console.log(parsedUrl);
+  request.query = Object.fromEntries(parsedUrl.searchParams);
 
   if (urlStruct[parsedUrl.pathname]) {
     urlStruct[parsedUrl.pathname](request, response);
