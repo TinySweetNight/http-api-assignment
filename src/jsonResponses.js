@@ -1,16 +1,14 @@
 
 
-const respondJSON = (request, response, status, object) => {
+const respondJSON = (request, response, status, object, type) => {
   const content = JSON.stringify(object);
 
   response.writeHead(status, { 
-    'Content-Type': 'application/json',
+    'Content-Type': type,
     'Content-Length': Buffer.byteLength(content, 'utf8'),
   });
 
-   if(request.method !== 'HEAD' && status !== 204) {
-    response.write(JSON.stringify(object));
-  }
+  response.write(content);
   response.end();
 };
 
@@ -18,7 +16,7 @@ const success = (request, response) => {
   const responseJSON = {
     message: 'This is a successful response',
   };
-  return respondJSON(request, response, 200, responseJSON);
+  return respondJSON(request, response, 200, responseJSON, type);
 };
 
 const badRequest = (request, response) => {
@@ -43,7 +41,7 @@ const unauthorized = (request, response) => {
     message: 'This request has the required parameters',
   };
 
-  if(!request.query.valid || request.query.valid !== 'true'){
+  if(!request.query.loggedIn || request.query.loggedIn !== 'true'){
     responseJSON.message = "Missing loggedIn query parameters set to yes";
     responseJSON.id = 'unauthorized';
     return respondJSON(request, response, 401, responseJSON);
@@ -102,5 +100,5 @@ module.exports = {
   unauthorized,
   forbidden,
   internal,
-  notImplimented
+  notImplimented,
 };

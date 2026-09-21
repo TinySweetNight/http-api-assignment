@@ -24,7 +24,6 @@ const onRequest = (request, response) => {
   request.query = Object.fromEntries(parsedUrl.searchParams);
 
   console.log(parsedUrl);
-  console.log(request.query);
 
   if (urlStruct[parsedUrl.pathname]) {
     urlStruct[parsedUrl.pathname](request, response);
