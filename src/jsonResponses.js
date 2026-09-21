@@ -1,22 +1,29 @@
 
 
-const respondJSON = (request, response, status, object, type) => {
+const respondJSON = (request, response, status, object) => {
   const content = JSON.stringify(object);
 
+  console.log(request.acceptedTypes[0]);
+
+  //If it's not s set to xml change it. 
+
+  //this is an If statement
   response.writeHead(status, { 
-    'Content-Type': type,
+    'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(content, 'utf8'),
   });
 
+  // Some where?? If 
   response.write(content);
   response.end();
 };
+
 
 const success = (request, response) => {
   const responseJSON = {
     message: 'This is a successful response',
   };
-  return respondJSON(request, response, 200, responseJSON, response.type);
+  return respondJSON(request, response, 200, responseJSON);
 };
 
 const badRequest = (request, response) => {
