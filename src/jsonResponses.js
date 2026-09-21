@@ -16,7 +16,7 @@ const success = (request, response) => {
   const responseJSON = {
     message: 'This is a successful response',
   };
-  return respondJSON(request, response, 200, responseJSON, type);
+  return respondJSON(request, response, 200, responseJSON, response.type);
 };
 
 const badRequest = (request, response) => {
